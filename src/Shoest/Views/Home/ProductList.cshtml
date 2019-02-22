@@ -1,0 +1,70 @@
+﻿@using PagedList
+@using PagedList.Mvc
+@model IEnumerable<Shopping.Models.Product>
+
+@{
+    ViewBag.Title = "ProductList";
+}
+
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<h2>@Html.DisplayNameFor(model => model.ToList()[0])</h2>
+
+<h3>您正在浏览【@Model.First().ProductCategory.Name】分类的商品：</h3>
+
+@{
+    var ajaxOption = new AjaxOptions()
+    {
+        OnSuccess = "AddToCartSuccess",
+        OnFailure = "AddToCartFailure",
+        HttpMethod = "Post"
+    };
+}
+
+<script type="text/javascript">
+    function AddToCartSuccess()
+    {
+        alert('添加购物车成功');
+        location.reload();
+    }
+
+    function AddToCartFailure(xhr)
+    {
+        alert('添加购物车失败（Http状态码：' + xhr.status + ')');
+    }
+</script>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Description)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Price)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.ActionLink(item.Name, "ProductDetail", new { id = item.Id})
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Price)
+        </td>
+        <td>
+            @Ajax.ActionLink("添加购物车", "AddToCart", "Cart", new { ProductId = item.Id}, ajaxOption)
+        </td>
+    </tr>
+}
+
+</table>
+
+@{ 
+    var data = Model as IPagedList<Shopping.Models.Product>;
+}
+@Html.PagedListPager(list: data, generatePageUrl: page => Url.Action("ProductList", new { p = page}))

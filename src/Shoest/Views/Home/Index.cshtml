@@ -1,0 +1,33 @@
+﻿@using PagedList
+@using PagedList.Mvc
+@model IEnumerable<Shopping.Models.ProductCategory>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>@Html.DisplayNameFor(model => model.ToList()[0])</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.ActionLink(item.Name, "ProductList", new { id=item.Id})
+        </td>
+    </tr>
+}
+
+</table>
+
+
+@{
+    var data = Model as IPagedList<Shopping.Models.ProductCategory>;
+}
+@Html.PagedListPager(list: data, generatePageUrl: page => Url.Action("Index", new { p = page }))

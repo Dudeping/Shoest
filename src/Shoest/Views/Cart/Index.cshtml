@@ -1,0 +1,91 @@
+﻿@using PagedList
+@using PagedList.Mvc
+@model List<Shopping.Models.Cart>
+
+@{
+    ViewBag.Title = "Cart";
+}
+
+<h2>购物车列表</h2>
+
+@{
+    var ajaxOption = new AjaxOptions()
+    {
+        OnSuccess = "RemoveCartSuccess",
+        OnFailure = "RemoveCartFailure",
+        Confirm = "您确定要从购物车删除这个商品么？",
+        HttpMethod = "Post"
+    };
+}
+
+<script>
+    function RemoveCartSuccess() {
+        alert('移除购物车项目成功');
+        location.reload();
+    }
+    function RemoveCartFailure(xhr) {
+        alert('移除购物车项目失败（HTTP状态码：' + xhr.status + '）');
+    }
+</script>
+
+@using (Html.BeginForm("UpdateAmount", "Cart"))
+{
+    <table class="table">
+        <tr>
+            <th>产品名称</th>
+            <th>单价</th>
+            <th>数量</th>
+            <th>小计</th>
+            <th></th>
+        </tr>
+
+        @{ int subTotal = 0;}
+
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            //计算购买商品总价
+            subTotal += Model[i].Product.Price * Model[i].Amount;
+
+            //选择商品的数量只能在1~100
+            var ddlAmountList = new SelectList(Enumerable.Range(1, 100), Model[i].Amount);
+
+            @Html.HiddenFor(modelItem => Model[i].Product.Id);
+
+            <tr>
+                <td>
+                    @Html.DisplayFor(ModelItem => Model[i].Product.Name)
+                </td>
+                <td>
+                    NT$ @(Model[i].Product.Price)
+                </td>
+                <td>
+                    @Html.DropDownListFor(ModelItem => Model[i].Amount, ddlAmountList)
+                </td>
+                <td>
+                    NT$ @(Model[i].Product.Price * Model[i].Amount)
+                </td>
+                <td>
+                    @Ajax.ActionLink("删除", "Remove", new { ProductId = Model[i].Product.Id }, ajaxOption)
+                </td>
+            </tr>
+        }
+        <tr>
+            <th id="subtotal">
+                <br />
+                <br />
+                总价: &nbsp;&nbsp;&nbsp;&nbsp;
+                NT$ @subTotal
+            </th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </table>
+    <p>
+        <input type="submit" value="更新数量"  class="btn btn-default" />
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="button" value="完成订单" onclick="location.href='@Url.Action("Complete", "Order")';"  class="btn btn-default" />
+    </p>
+}

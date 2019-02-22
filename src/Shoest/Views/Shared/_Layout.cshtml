@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Shopping Web Site</title>
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="~/Scripts/modernizr-2.6.2.js"></script>
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("购物网", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>
+                        @{
+                            var productList = ((List<Shopping.Models.Cart>)Session["Carts"]) ?? new List<Shopping.Models.Cart>();
+                            int num = 0;
+                            foreach (var item in productList)
+                            {
+                                num += item.Amount;
+                            }
+                            if (num > 0)
+                            {
+                                <a href="/Cart/Index">购物车 <span class="label label-success pull-right">@num</span></a>
+                            }
+                            else
+                            {
+                                <a href="/Cart/Index">购物车</a>
+                            }
+                        }
+                    </li>
+                </ul>
+                @if (Request.IsAuthenticated)
+                {
+                    <ul class="nav navbar-nav navbar-right" style="font-size:16px">
+                        <li><a href="/Member/Logout">你好, @User.Identity.Name ! 点击注销</a></li>
+                    </ul>
+                }
+                else
+                {
+                    <ul class="nav navbar-nav navbar-right" style="font-size:16px">
+                        <li>@Html.ActionLink("登录", "Login", "Member")</li>
+                        <li>@Html.ActionLink("注册", "Register", "Member")</li>
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>
+    </div>
+
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/scripts/jquery.unobtrusive-ajax.js"></script>
+</body>
+</html>
